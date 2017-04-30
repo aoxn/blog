@@ -1,0 +1,5 @@
+FROM registry.cn-hangzhou.aliyuncs.com/spacexnice/hexo-amd64:v1.0.2
+COPY . /Hexo
+RUN bash build.sh
+
+ENTRYPOINT ["hexo","s"]
