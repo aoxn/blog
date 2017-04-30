@@ -1,6 +1,8 @@
-podTemplate(label: 'mypod', inheritFrom: 'jnlp', containers: [
+podTemplate(label: 'jenkins-slave-pod',  containers: [
+    /*
     containerTemplate(name: 'golang', image: 'registry.cn-hangzhou.aliyuncs.com/spacexnice/golang:1.6.3', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'docker', image: 'registry.cn-hangzhou.aliyuncs.com/spacexnice/docker:1.12.6', command: 'cat', ttyEnabled: true)
+    */
+    containerTemplate(name: 'docker', image: 'registry.cn-hangzhou.aliyuncs.com/spacexnice/jenkins-slave:latest', command: '', ttyEnabled: false)
   ]
   ,volumes: [
 /*
@@ -9,17 +11,17 @@ podTemplate(label: 'mypod', inheritFrom: 'jnlp', containers: [
      hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
   ]) {
 
-    node ('jenkins-pod-slave') {
+    node ('jenkins-slave-pod') {
 
         stage('Get a Golang project') {
-            git url: 'https://github.com/spacexnice/blog.git'
-            container('docker') {
+	
+            git url: 'https://code.aliyun.com/spacexnice/blog.git'
+        
+	    container('docker') {
                 stage('Build blog project') {
-                    sh """
-                        docker build -t registry.cn-hangzhou.aliyuncs.com/spacexnice/blog:v1.0.0 .
-                        """
-
-                }
+		
+		sh "docker build -t registry.cn-hangzhou.aliyuncs.com/spacexnice/blog:v1.0.0 ."
+		}
             }
         }
 
