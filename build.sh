@@ -1,3 +1,2 @@
-hexo init
 hexo clean
-hexo g
+hexo generate
