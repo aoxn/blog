@@ -1,0 +1,61 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  labels:
+    app: kubernetes-blog
+  name: kubernetes-blog
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubernetes-blog
+  template:
+    metadata:
+      labels:
+        app: kubernetes-blog
+      # Comment the following annotaion if Dashboard must not be deployed on master
+      annotations:
+        scheduler.alpha.kubernetes.io/tolerations: |
+          [
+            {
+              "key": "dedicated",
+              "operator": "Equal",
+              "value": "master",
+              "effect": "NoSchedule"
+            }
+          ]
+    spec:
+      containers:
+      - name: kubernetes-blog
+        image: registry.cn-hangzhou.aliyuncs.com/spacexnice/blog:v1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        args:
+          # Uncomment the following line to manually specify Kubernetes API server Host
+          # If not specified, Dashboard will attempt to auto discover the API server and connect
+          # to it. Uncomment only if the default does not work.
+          # - --apiserver-host=http://my-address:port
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4000
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: kubernetes-blog
+  name: kubernetes-blog
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 4000
+  selector:
+    app: kubernetes-blog
+
